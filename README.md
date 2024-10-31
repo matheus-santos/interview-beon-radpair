@@ -96,7 +96,7 @@ No issues found.
 
 ## Video demo
 
-- [./docs/videos/Flight Test 2.mov](./docs/videos/Flight%20Test%202.mov)
+- [./docs/videos/Flight Test 2.mov](https://github.com/matheus-santos/interview-beon-radpair/wiki)
 
 # Next Steps
 
