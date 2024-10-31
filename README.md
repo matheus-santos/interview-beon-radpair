@@ -96,7 +96,7 @@ No issues found.
 
 ## Video demo
 
-<video src="./docs/videos/Flight Test 2.mov" width="256" />
+- [./docs/videos/Flight Test 2.mov](./docs/videos/Flight%20Test%202.mov)
 
 # Next Steps
 
