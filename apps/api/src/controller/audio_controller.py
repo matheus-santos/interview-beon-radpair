@@ -3,7 +3,6 @@ from fastapi.responses import Response, FileResponse
 from ..service.speech_to_text_service import SpeechToTextService
 from ..service.llm_service import LLMService
 import base64
-from pydub import AudioSegment
 
 
 router = APIRouter(
@@ -15,18 +14,16 @@ router = APIRouter(
 @router.post("/send")
 async def send_audio(file: UploadFile = File(...)):
 
+    # Save audio file
+    with open(f"data/{file.filename}", "wb") as audio_file:
+        audio_file.write(file.file.read())
+
     # Initiate services
     llm_service = LLMService().create(provider="GEMINI")
     speech_service = SpeechToTextService()
 
-    # Save audio file temporarily
-    with open(f"data/{file.filename}", "wb") as audio_file:
-        audio_file.write(file.file.read())
-        sound = AudioSegment.from_mp3(f"data/{file.filename}")
-        sound.export(f"data/tmp.wav", format="wav")
-
     # Convert audio to text then get reply
-    text = speech_service.speechToText(f"data/tmp.wav")
+    text = speech_service.speechToText(f"data/{file.filename}")
     answer = llm_service.reply(text)
     audio_filepath = speech_service.textToSpeech(answer)
 

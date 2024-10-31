@@ -1,9 +1,9 @@
 import * as React from 'react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 /** MUI */
-import { Grid, Paper, Snackbar, Box } from '@mui/material'
+import { Grid, Paper, Snackbar, Box, LinearProgress } from '@mui/material'
 import BottomNavigation from '@mui/material/BottomNavigation'
 import BottomNavigationAction from '@mui/material/BottomNavigationAction'
 import RecordVoiceOverIcon from '@mui/icons-material/RecordVoiceOver'
@@ -13,6 +13,7 @@ import PauseCircleIcon from '@mui/icons-material/PauseCircle'
 /** Components */
 import { useAudioRecorder } from 'react-audio-voice-recorder'
 
+// TODO: move conversion method to utils as AudioUtils
 function convertDataURIToBinary(dataURI: any) {
   var BASE64_MARKER = ';base64,'
   var base64Index = dataURI.indexOf(BASE64_MARKER) + BASE64_MARKER.length
@@ -27,6 +28,7 @@ function convertDataURIToBinary(dataURI: any) {
   return array
 }
 
+// TODO: move audio capture to utils as AudioUtils
 const addAudioElement = (data: any) => {
   // Convert base64 str from API into blob
   const binary = convertDataURIToBinary(data)
@@ -48,6 +50,9 @@ const addAudioElement = (data: any) => {
 
 /** Implementation */
 export const MainPage: React.FC = () => {
+  /** State */
+  const [processing, setProcessing] = useState(false)
+
   /** Hooks */
   const { startRecording, stopRecording, recordingBlob, isRecording } =
     useAudioRecorder()
@@ -56,7 +61,10 @@ export const MainPage: React.FC = () => {
   useEffect(() => {
     if (!recordingBlob) return
 
-    const filename = 'audio.mp3'
+    setProcessing(true)
+
+    // TODO: move audio capture to utils as AudioUtils
+    const filename = 'input.webm'
     const file = new File([recordingBlob], filename, {
       type: recordingBlob.type,
     })
@@ -71,6 +79,7 @@ export const MainPage: React.FC = () => {
     formData.append('file', audioDataInput.files[0])
     formData.append('filename', filename)
 
+    // TODO: Move this POST request to AudioApiService
     axios
       .post('http://localhost:8020/audio/send', formData, {
         headers: {
@@ -79,6 +88,7 @@ export const MainPage: React.FC = () => {
       })
       .then((response) => {
         addAudioElement(response.data)
+        setProcessing(false)
       })
   }, [recordingBlob])
 
@@ -93,12 +103,6 @@ export const MainPage: React.FC = () => {
 
   return (
     <Box sx={{ pb: 7 }} overflow="auto">
-      <Snackbar
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        open={isRecording}
-        message={'Recording...'}
-        sx={{ '&.MuiSnackbar-root': { bottom: '70px' } }}
-      />
       <Grid
         container
         spacing={0}
@@ -107,11 +111,18 @@ export const MainPage: React.FC = () => {
         justifyContent="center"
         sx={{ minHeight: '82vh' }}
       >
-        <Box overflow="auto">
-          {isRecording ? (
-            <span>Recording now...</span>
+        <Box>
+          {processing ? (
+            <>
+              <LinearProgress />
+              <span>Please wait...</span>
+            </>
           ) : (
-            <span>Click below to send a message</span>
+            <span>
+              {isRecording
+                ? 'Recording now...'
+                : 'Click below to send a message'}
+            </span>
           )}
         </Box>
 
@@ -128,6 +139,13 @@ export const MainPage: React.FC = () => {
           />
         </form>
       </Grid>
+
+      <Snackbar
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        open={isRecording}
+        message={'Recording...'}
+        sx={{ '&.MuiSnackbar-root': { bottom: '70px' } }}
+      />
 
       <Paper
         sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }}
