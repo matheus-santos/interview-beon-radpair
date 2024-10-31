@@ -2,7 +2,56 @@
 
 Interview BeOn Radpair Voice App
 
-# Setup
+# Getting Started
+
+![](./docs/diagram_1.svg)
+
+<details>
+<summary>Click here to see the System Design as event-oriented architecture </summary>
+
+![](./docs/diagram_2_event_sourcing.svg)
+
+</details>
+
+## Project Structure
+
+The project is structured in two applications: a web app built in React.js using
+craco boiler plate; and an api built with FastApi. Here's how it looks:
+
+```
+apps/
+├─ api/ (1)
+│  ├─ src/
+│  │  ├─ controller/
+│  │  ├─ service/
+│  │  ├─ main.py
+│  │  ├─ router.py
+│  ├─ tests/
+│  │  ├─ .../
+│  ├─ .env
+│  ├─ app.py
+├─ web/ (2)
+│  ├─ src/
+│  │  ├─ components/
+│  │  ├─ contexts/
+│  │  ├─ hooks/
+│  │  ├─ App.tsx
+│  │  ├─ index.tsx
+│  ├─ package.json
+docs/ (3)
+├─ videos/
+│  ├─ Flight Test 1
+│  ├─ Flight Test 2
+README.md
+```
+
+Where:
+
+1. `api/`: api that will receive an audio and connect with LLM for an answer.
+2. `web/`: web app with the interface to talk to the api.
+3. `docs/`: documentation and Flight tests recorded during development.
+
+## Setup
 
 ```
 $ cd apps/api && poetry run python app.py &
@@ -48,3 +97,26 @@ No issues found.
 ## Video demo
 
 <video src="./docs/videos/Flight Test 2.mov" width="256" />
+
+# Next Steps
+
+This PoC is quite raw and we have a lot of room for improvement. Here's how
+the next steps would look like:
+
+Front-End:
+
+- Separate audio recorder capabilities into a Utility folder.
+- Add unit tests using RTL and jest.
+- Add interface tests using Cypress.
+- Compress audio into gzip for faster transfer to the API.
+
+Back-End:
+
+- Add unit and integration tests on the Back-End side for controller and services.
+- Add mocks into LLM Service to mitigate API costs.
+- Compress response into a gzip for faster transfer to the API.
+
+Infrastructure:
+
+- Create a Docker file and virtual environment for the Api.
+- Add build capabilities for Front-End app to generate a production-ready zip.
